@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кафе «Столичный вкус» — БЦ Искра-парк</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/main.css">
+</head>
+<body>
+    <header>
+        <div class="header-inner">
+            <a href="#" class="logo">Столичный <span>Вкус</span></a>
+            <nav id="nav">
+                <a href="#about">О кафе</a>
+                <a href="#lunch">Меню</a>
+                <a href="#contacts">Контакты</a>
+            </nav>
+            <div class="header-actions">
+                <button class="cart-btn" onclick="openCart()">
+                    <span class="cart-icon">🛒</span>
+                    <span>Корзина</span>
+                    <span class="cart-count" id="cartCount"></span>
+                </button>
+                <button class="mobile-menu-btn" onclick="document.getElementById('nav').classList.toggle('active')">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+    <div class="cart-modal" id="cartModal">
+        <div class="cart-header">
+            <h3>Корзина</h3>
+            <button class="cart-close" onclick="closeCart()">×</button>
+        </div>
+        <div class="cart-body">
+            <div class="cart-empty" id="cartEmpty">
+                <p>Корзина пуста</p>
+                <button class="btn btn-sm" onclick="closeCart()">Выбрать блюда</button>
+            </div>
+            <div id="cartItems"></div>
+            <div class="order-success" id="orderSuccess">
+                <h3>Заказ оформлен!</h3>
+                <div class="order-number" id="orderNumber"></div>
+                <p>Самовывоз: <strong id="orderDateTime"></strong></p>
+                <p>Вы сможете забрать свой заказ на раздаче по номеру.<br>Оплата на кассе без очереди.</p>
+                <p style="margin-top: 16px;"><strong>К оплате: <span id="orderTotalSuccess" style="color: var(--highlight); font-family: 'Oswald', sans-serif; font-size: 24px;"></span></strong></p>
+                <button class="btn" onclick="closeCart(); location.reload();">Новый заказ</button>
+            </div>
+        </div>
+        <div class="cart-footer" id="cartFooter">
+            <div class="cart-total">
+                <span class="cart-total-label">Итого:</span>
+                <span class="cart-total-price" id="cartTotal">0 ₽</span>
+            </div>
+            <button class="btn btn-filled" onclick="showOrderForm()" id="checkoutBtn">Оформить заказ</button>
+
+            <div class="order-form" id="orderForm">
+                <label>Ваше имя</label>
+                <input type="text" id="orderName" placeholder="Иван" required>
+                <label>Телефон</label>
+                <input type="tel" id="orderPhone" placeholder="+7 (___) ___-__-__" required>
+                <label>Дата самовывоза</label>
+                <select id="orderDate" required>
+                    <option value="">Выберите дату</option>
+                </select>
+                <label>Время самовывоза</label>
+                <select id="orderTime" required>
+                    <option value="">Выберите время</option>
+                    <option value="12:00">12:00</option>
+                    <option value="12:30">12:30</option>
+                    <option value="13:00">13:00</option>
+                    <option value="13:30">13:30</option>
+                    <option value="14:00">14:00</option>
+                    <option value="14:30">14:30</option>
+                </select>
+                <label>Комментарий (необязательно)</label>
+                <textarea id="orderComment" rows="3" placeholder="Пожелания к заказу"></textarea>
+                <button class="btn btn-filled" onclick="submitOrder()" style="width: 100%; margin-top: 8px;">Подтвердить заказ</button>
+                <button class="btn" onclick="hideOrderForm()" style="width: 100%; margin-top: 8px;">Назад</button>
+            </div>
+        </div>
+    </div>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Столичный <span class="highlight">Вкус</span></h1>
+            <p class="subtitle">Кафе самообслуживания в БЦ «Искра-парк»</p>
+            <p class="tagline">Кафе с доступными ценами, вкусной кухней и безупречным сервисом. Концепция <span class="highlight">free flow</span> — свободное движение.</p>
+            <a href="#lunch" class="btn">Смотреть меню</a>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="feature-card">
+            <div class="time">09:00 — 11:30</div>
+            <h3>Домашние завтраки</h3>
+        </div>
+        <div class="feature-card">
+            <div class="time">09:00 — 17:00</div>
+            <h3>Собственная выпечка</h3>
+        </div>
+        <div class="feature-card">
+            <div class="time">12:00 — 16:00</div>
+            <h3>Салат-бар</h3>
+        </div>
+        <div class="feature-card">
+            <div class="time">12:00 — 17:00</div>
+            <h3>Обеды</h3>
+        </div>
+        <div class="feature-card">
+            <div class="time">12:00 — 16:00</div>
+            <h3>Вок-гриль бар</h3>
+        </div>
+    </section>
+
+    <section class="about" id="about">
+        <div class="container">
+            <div class="about-grid">
+                <div>
+                    <h2>О <span class="highlight">кафе</span></h2>
+                    <p>Кафе «Столичный вкус» в БЦ «Искра-парк» — это великолепно организованная концепция <strong>free flow</strong> («Фри-фло» — означает «свободное движение»).</p>
+                    <p>Здесь есть всё для того, чтобы вы могли вкусно и сытно поесть без излишних затрат времени и денег.</p>
+                    <a href="#contacts" class="btn">Подробнее</a>
+                </div>
+                <div class="about-image">
+                    <img src="https://stvkus.ru/wp-content/uploads/2024/12/iskra.png" alt="Интерьер кафе" loading="lazy">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="menu-section" id="lunch" style="background: var(--light-gray);">
+        <div class="container">
+            <h2>Наше <span class="highlight">меню</span></h2>
+            <p class="desc">Вы можете оформить самовывоз только на будущую дату</p>
+
+            <div class="menu-date-selector">
+                <label for="menuDateSelect">Выберите дату:</label>
+                <select id="menuDateSelect" onchange="filterMenuByDate()">
+                    <option value="">Загрузка...</option>
+                </select>
+            </div>
+
+            <div class="menu-grid" id="menuItems"></div>
+        </div>
+    </section>
+
+    <section class="groups">
+        <div class="container">
+            <div class="groups-inner">
+                <div>
+                    <h2>Для <span class="highlight">туристических</span> групп</h2>
+                    <p>Кафе «Столичный Вкус» ждёт туристические группы до 500 человек, где вы сможете насладиться отличной кухней и уютной атмосферой.</p>
+                    <a href="mailto:stv-iskra@yandex.ru" class="btn btn-filled">Связаться с нами</a>
+                </div>
+                <div class="about-image">
+                    <img src="https://stvkus.ru/wp-content/uploads/2024/12/samoobsluj.png" alt="Кафе" loading="lazy">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="contacts" id="contacts">
+        <div class="container">
+            <h2>Наши <span class="highlight">контакты</span></h2>
+            <div class="contacts-grid">
+                <div class="contact-card">
+                    <h3>Адрес</h3>
+                    <p>Москва, Ленинградский пр-т,<br>д. 35 стр. 1<br>подъезд №4, 1 этаж</p>
+                </div>
+                <div class="contact-card">
+                    <h3>Время работы</h3>
+                    <p>с 09:00 до 17:00<br>(Пн-Пт)</p>
+                    <p style="margin-top: 12px; font-size: 13px;">Завтрак: 9:00 — 11:30<br>Обед: 12:00 — 17:00<br>Салат-бар: 12:00 — 16:00</p>
+                </div>
+                <div class="contact-card">
+                    <h3>Телефон</h3>
+                    <p><a href="tel:+79104844717">+7 (910) 484-47-17</a></p>
+                    <p><a href="tel:+79859983149">+7 (985) 998-31-49</a></p>
+                    <p><a href="tel:+79852110989">+7 (985) 211-09-89</a></p>
+                </div>
+                <div class="contact-card">
+                    <h3>Email</h3>
+                    <p><a href="mailto:stv-iskra@yandex.ru">stv-iskra@yandex.ru</a></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="advantages">
+        <div class="container">
+            <h2><span class="highlight">Вкусно</span>, выгодно, удобно</h2>
+            <div class="advantages-grid">
+                <div class="advantage-item">
+                    <h3>Лидер рынка</h3>
+                    <p>«Столичный вкус» уже практически десятилетие по праву занимает лидирующие позиции на рынке кейтеринга в столице</p>
+                </div>
+                <div class="advantage-item">
+                    <h3>Опыт</h3>
+                    <p>Кафе считается одним из старейших заведений этой категории и обладает исчерпывающей инфраструктурой</p>
+                </div>
+                <div class="advantage-item">
+                    <h3>Качество</h3>
+                    <p>Оптимальное соотношение цены и качества услуг кафе. Безупречный сервис и вкусная кухня</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>© 2025 Кафе «Столичный вкус» — БЦ «Искра-парк»</p>
+        </div>
+    </footer>
+
+    <script>
+        let cart = [];
+        let currentMenuItems = []; // кэш блюд текущей выбранной даты
+
+        // --- Меню ---
+
+        async function fetchMenuForDate(date) {
+            if (!date) return [];
+            const res = await fetch(`/api/menu?date=${date}`);
+            if (!res.ok) return [];
+            return res.json();
+        }
+
+        async function filterMenuByDate() {
+            const date = document.getElementById('menuDateSelect').value;
+            const menuGrid = document.getElementById('menuItems');
+
+            if (!date) {
+                menuGrid.innerHTML = '<p style="color: var(--gray); text-align: center; grid-column: 1/-1;">Выберите дату</p>';
+                return;
+            }
+
+            menuGrid.innerHTML = '<p style="color: var(--gray); text-align: center; grid-column: 1/-1;">Загрузка...</p>';
+
+            const menuData = await fetchMenuForDate(date);
+            currentMenuItems = menuData;
+
+            const menuSection = document.getElementById('lunch');
+
+            if (menuData.length === 0) {
+                menuGrid.innerHTML = '<p style="color: var(--gray); text-align: center; grid-column: 1/-1;">Нет блюд для выбранной даты</p>';
+                menuSection.style.display = 'block';
+                return;
+            }
+
+            menuGrid.innerHTML = menuData.map(item => `
+                <div class="menu-item" data-id="${item.id}">
+                    <div class="name">${item.name}</div>
+                    <p class="composition">${item.composition || ''}</p>
+                    <div class="meta">
+                        <span>${item.weight || ''}</span>
+                        <span class="price">${item.price} ₽</span>
+                    </div>
+                    <button class="btn btn-sm btn-add" onclick="addToCart(${item.id}, '${item.name.replace(/'/g, "\\'")}', ${item.price})">В корзину</button>
+                </div>
+            `).join('');
+
+            menuSection.style.display = 'block';
+        }
+
+        function initMenuDateSelector() {
+            const select = document.getElementById('menuDateSelect');
+            if (!select) return;
+
+            select.innerHTML = '<option value="">Выберите дату</option>';
+
+            let daysAdded = 0;
+            let i = 1;
+
+            while (daysAdded < 3 && i <= 60) {
+                const date = new Date();
+                date.setDate(date.getDate() + i);
+                const dayOfWeek = date.getDay();
+
+                if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                    const yyyy = date.getFullYear();
+                    const mm = String(date.getMonth() + 1).padStart(2, '0');
+                    const dd = String(date.getDate()).padStart(2, '0');
+                    const dateStr = `${yyyy}-${mm}-${dd}`;
+                    const displayDate = date.toLocaleDateString('ru-RU', { weekday: 'short', day: 'numeric', month: 'long' });
+                    select.innerHTML += `<option value="${dateStr}">${displayDate}</option>`;
+                    daysAdded++;
+                }
+                i++;
+            }
+
+            if (select.options.length > 1) {
+                select.selectedIndex = 1;
+                filterMenuByDate();
+            }
+        }
+
+        // --- Корзина ---
+
+        function addToCart(id, name, price) {
+            const menuItem = currentMenuItems.find(m => m.id === id);
+            if (menuItem && menuItem.available === false) return;
+
+            const currentQty = cart.find(item => item.id === id)?.qty || 0;
+            const maxQty = (menuItem && menuItem.quantity) ? menuItem.quantity : 50;
+
+            if (currentQty >= maxQty) {
+                alert('Доступное количество: ' + maxQty);
+                return;
+            }
+
+            const existing = cart.find(item => item.id === id);
+            if (existing) {
+                existing.qty++;
+            } else {
+                cart.push({ id, name, price, qty: 1 });
+            }
+            updateCart();
+
+            const menuItemEl = document.querySelector(`.menu-item[data-id="${id}"]`);
+            if (menuItemEl) {
+                menuItemEl.classList.add('added');
+                setTimeout(() => menuItemEl.classList.remove('added'), 300);
+            }
+        }
+
+        function removeFromCart(id) {
+            cart = cart.filter(item => item.id !== id);
+            updateCart();
+        }
+
+        function changeQty(id, delta) {
+            const item = cart.find(i => i.id === id);
+            if (item) {
+                item.qty += delta;
+                if (item.qty <= 0) {
+                    removeFromCart(id);
+                } else {
+                    updateCart();
+                }
+            }
+        }
+
+        function updateCart() {
+            const cartCount = document.getElementById('cartCount');
+            const cartItems = document.getElementById('cartItems');
+            const cartEmpty = document.getElementById('cartEmpty');
+            const cartTotal = document.getElementById('cartTotal');
+            const cartFooter = document.getElementById('cartFooter');
+
+            const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+            const totalPrice = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+
+            cartCount.textContent = totalQty > 0 ? totalQty : '';
+            cartTotal.textContent = totalPrice + ' ₽';
+
+            if (cart.length === 0) {
+                cartEmpty.style.display = 'block';
+                cartItems.style.display = 'none';
+                cartFooter.style.display = 'none';
+            } else {
+                cartEmpty.style.display = 'none';
+                cartItems.style.display = 'block';
+                cartFooter.style.display = 'block';
+
+                cartItems.innerHTML = cart.map(item => `
+                    <div class="cart-item">
+                        <div class="cart-item-info">
+                            <div class="cart-item-name">${item.name}</div>
+                            <div class="cart-item-price">${item.price} ₽</div>
+                            <div class="cart-item-controls">
+                                <button class="qty-btn" onclick="changeQty(${item.id}, -1)">−</button>
+                                <span class="cart-item-qty">${item.qty}</span>
+                                <button class="qty-btn" onclick="changeQty(${item.id}, 1)">+</button>
+                            </div>
+                        </div>
+                        <div class="cart-item-total">
+                            <div class="cart-item-total-price">${item.price * item.qty} ₽</div>
+                            <button class="cart-item-remove" onclick="removeFromCart(${item.id})">Удалить</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function openCart() {
+            document.getElementById('cartModal').classList.add('open');
+            document.getElementById('cartOverlay').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeCart() {
+            document.getElementById('cartModal').classList.remove('open');
+            document.getElementById('cartOverlay').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        // --- Форма заказа ---
+
+        function initDateSelect() {
+            const select = document.getElementById('orderDate');
+            select.innerHTML = '<option value="">Выберите дату</option>';
+
+            let daysAdded = 0;
+            let i = 1;
+
+            while (daysAdded < 3 && i <= 60) {
+                const date = new Date();
+                date.setDate(date.getDate() + i);
+                const dayOfWeek = date.getDay();
+
+                if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                    const yyyy = date.getFullYear();
+                    const mm = String(date.getMonth() + 1).padStart(2, '0');
+                    const dd = String(date.getDate()).padStart(2, '0');
+                    const dateStr = `${yyyy}-${mm}-${dd}`;
+                    const displayDate = date.toLocaleDateString('ru-RU', { weekday: 'short', day: 'numeric', month: 'long' });
+                    select.innerHTML += `<option value="${dateStr}">${displayDate}</option>`;
+                    daysAdded++;
+                }
+                i++;
+            }
+        }
+
+        function showOrderForm() {
+            document.getElementById('checkoutBtn').style.display = 'none';
+            document.getElementById('orderForm').classList.add('active');
+            document.getElementById('orderPhone').value = '+7';
+            initDateSelect();
+            document.getElementById('orderForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function hideOrderForm() {
+            document.getElementById('checkoutBtn').style.display = 'block';
+            document.getElementById('orderForm').classList.remove('active');
+        }
+
+        async function submitOrder() {
+            const name = document.getElementById('orderName').value.trim();
+            const phone = document.getElementById('orderPhone').value.trim();
+            const pickupDate = document.getElementById('orderDate').value;
+            const pickupTime = document.getElementById('orderTime').value;
+            const comment = document.getElementById('orderComment').value.trim();
+
+            if (!name || !phone || !pickupDate || !pickupTime) {
+                alert('Пожалуйста, заполните обязательные поля');
+                return;
+            }
+
+            const btn = document.querySelector('#orderForm .btn-filled');
+            btn.disabled = true;
+            btn.textContent = 'Оформляем...';
+
+            try {
+                const res = await fetch('/api/orders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name,
+                        phone,
+                        pickupDate,
+                        pickupTime,
+                        comment: comment || undefined,
+                        items: cart.map(item => ({ id: item.id, qty: item.qty })),
+                    }),
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    alert(data.error || 'Ошибка оформления заказа');
+                    btn.disabled = false;
+                    btn.textContent = 'Подтвердить заказ';
+                    return;
+                }
+
+                const dateObj = new Date(data.pickupDate + 'T00:00:00');
+                const formattedDate = dateObj.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+
+                document.getElementById('orderNumber').textContent = data.number;
+                document.getElementById('orderDateTime').textContent = formattedDate + ' в ' + data.pickupTime;
+                document.getElementById('orderTotalSuccess').textContent = data.total + ' ₽';
+
+                document.getElementById('orderForm').classList.remove('active');
+                document.getElementById('orderSuccess').classList.add('active');
+                cart = [];
+                updateCart();
+            } catch (err) {
+                alert('Ошибка сети. Попробуйте ещё раз.');
+                btn.disabled = false;
+                btn.textContent = 'Подтвердить заказ';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            initMenuDateSelector();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админка — Кафе «Столичный вкус»</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/admin.css">
+</head>
+<body>
+    <div class="login-screen" id="loginScreen">
+        <div class="login-box">
+            <h1>Столичный <span class="highlight">Вкус</span></h1>
+            <p>Админ-панель</p>
+            <input type="text" id="loginInput" placeholder="Логин">
+            <input type="password" id="passwordInput" placeholder="Пароль">
+            <button class="btn btn-filled" onclick="handleLogin()" style="width: 100%;">Войти</button>
+        </div>
+    </div>
+
+    <div id="adminPanel" style="display: none;">
+        <header class="admin-header">
+            <div class="container">
+                <h1>Столичный <span class="highlight">Вкус</span> — Админка</h1>
+                <nav class="admin-nav">
+                    <button class="admin-nav-btn active" data-section="orders" onclick="showSection('orders')">Заказы</button>
+                    <button class="admin-nav-btn" data-section="menu" onclick="showSection('menu')">Управление меню</button>
+                    <button class="admin-nav-btn" data-section="stats" onclick="showSection('stats')">Статистика</button>
+                    <button class="admin-nav-btn" data-section="contacts" onclick="showSection('contacts')">Контакты</button>
+                    <button class="admin-nav-btn" data-section="users" onclick="showSection('users')">Пользователи</button>
+                    <button class="admin-nav-btn" onclick="logout()">Выйти</button>
+                </nav>
+            </div>
+        </header>
+
+        <div class="container">
+            <div id="ordersSection" class="admin-section active">
+                <div class="stats" id="stats">
+                    <div class="stat-card">
+                        <h3>Всего заказов</h3>
+                        <div class="value" id="totalOrders">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Новые</h3>
+                        <div class="value" id="newOrders">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Выполненные</h3>
+                        <div class="value" id="completedOrders">0</div>
+                    </div>
+                </div>
+
+                <div class="filters">
+                    <select id="filterStatus" onchange="loadOrders()">
+                        <option value="">Все статусы</option>
+                        <option value="new">Новые</option>
+                        <option value="completed">Выполненные</option>
+                    </select>
+                    <input type="date" id="filterDate" onchange="loadOrders()" placeholder="Фильтр по дате">
+                    <input type="text" id="filterSearch" placeholder="Поиск по номеру заказа..." oninput="loadOrders()">
+                </div>
+
+                <div class="orders-list" id="ordersList"></div>
+            </div>
+
+            <div id="statsSection" class="admin-section">
+                <h2 style="font-family: 'Oswald', sans-serif; font-size: 28px; margin-bottom: 20px;">Статистика</h2>
+                <div id="statsContent">
+                    <p style="color: var(--gray);">Загрузка статистики...</p>
+                </div>
+            </div>
+
+            <div id="contactsSection" class="admin-section">
+                <h2 style="font-family: 'Oswald', sans-serif; font-size: 28px; margin-bottom: 20px;">Контакты</h2>
+                <div id="contactsContent">
+                    <p style="color: var(--gray);">Загрузка контактов...</p>
+                </div>
+            </div>
+
+            <div id="usersSection" class="admin-section">
+                <h2 style="font-family: 'Oswald', sans-serif; font-size: 28px; margin-bottom: 20px;">Пользователи</h2>
+                <div id="usersContent">
+                    <p style="color: var(--gray);">Загрузка пользователей...</p>
+                </div>
+            </div>
+
+            <div id="menuSection" class="admin-section">
+                <h2 style="font-family: 'Oswald', sans-serif; font-size: 28px; margin-bottom: 20px;">Управление меню</h2>
+
+                <div class="filters">
+                    <div>
+                        <label style="display: block; margin-bottom: 4px; font-size: 12px; color: var(--gray);">Выбрать дату</label>
+                        <input type="date" id="menuDate" onchange="loadMenuForDate()">
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: flex-end;">
+                        <div>
+                            <label style="display: block; margin-bottom: 4px; font-size: 12px; color: var(--gray);">Копировать меню с даты</label>
+                            <input type="date" id="copyFromDate">
+                        </div>
+                        <button class="btn" onclick="copyMenuFromDate()">Копировать</button>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 30px; padding: 20px; background: white; border-radius: 8px;">
+                    <div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-end;">
+                        <div style="flex: 1; min-width: 300px;">
+                            <label style="display: block; margin-bottom: 4px; font-size: 14px; font-weight: 600; color: var(--dark);">Добавление блюда</label>
+                            <input type="text" id="newItemName" placeholder="Название блюда" style="padding: 8px 12px; border: 2px solid #ddd; border-radius: 4px; width: 100%; font-family: 'Open Sans', sans-serif;">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 4px; font-size: 12px; color: var(--gray);">Цена</label>
+                            <input type="number" id="newItemPrice" placeholder="₽" style="padding: 8px 12px; border: 2px solid #ddd; border-radius: 4px; width: 80px; font-family: 'Open Sans', sans-serif;">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 4px; font-size: 12px; color: var(--gray);">Вес</label>
+                            <input type="text" id="newItemWeight" placeholder="г" style="padding: 8px 12px; border: 2px solid #ddd; border-radius: 4px; width: 80px; font-family: 'Open Sans', sans-serif;">
+                        </div>
+                        <button class="btn btn-filled" onclick="addNewItem()">+ Добавить</button>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <input type="file" id="excelFile" accept=".xlsx,.xls">
+                            <button class="btn btn-sm" onclick="uploadMenuFromExcel()">Загрузить Excel</button>
+                            <button class="btn btn-sm" onclick="downloadTemplate()">Скачать шаблон</button>
+                            <span style="color: var(--gray); font-size: 12px;">Формат: Название, Цена, Вес</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="menuEditor">
+                    <div id="menuItemsList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Заказ</h3>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="/js/admin-app.js"></script>
+</body>
+</html>

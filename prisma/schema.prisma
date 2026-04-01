@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model AdminUser {
+  id           Int      @id @default(autoincrement())
+  login        String   @unique
+  passwordHash String
+  isSuperadmin Boolean  @default(false)
+  // JSON строка: {"orders":true,"stats":true,"contacts":true,"menu":true}
+  access       String   @default("{\"orders\":true,\"stats\":true,\"contacts\":true,\"menu\":true}")
+  createdAt    DateTime @default(now())
+}
+
+model MenuItem {
+  id          Int         @id @default(autoincrement())
+  menuDate    String
+  name        String
+  price       Int
+  weight      String      @default("")
+  category    String      @default("lunch")
+  composition String      @default("")
+  calories    Int         @default(0)
+  available   Boolean     @default(true)
+  quantity    Int         @default(50)
+  orderItems  OrderItem[]
+
+  @@index([menuDate])
+}
+
+model Order {
+  id           Int         @id @default(autoincrement())
+  number       String      @unique
+  customerName String
+  phone        String
+  pickupDate   String
+  pickupTime   String
+  comment      String?
+  total        Int
+  status       String      @default("new")
+  createdAt    DateTime    @default(now())
+  items        OrderItem[]
+}
+
+model OrderItem {
+  id         Int       @id @default(autoincrement())
+  orderId    Int
+  menuItemId Int?
+  name       String
+  price      Int
+  qty        Int
+  order      Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItem   MenuItem? @relation(fields: [menuItemId], references: [id], onDelete: SetNull)
+}
